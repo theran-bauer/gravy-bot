@@ -1,7 +1,8 @@
+import os
 import discord
 from discord.ext import commands
 
-TOKEN = 'NDYyMzczOTAxNzA0NjI2MTc2.DhhCCA.DRB74KYug9DnSK7sPgxSJBHiUyg'
+TOKEN = os.environ.get('TOKEN')
 
 bot = commands.Bot(command_prefix='!', description='A Gravy bot for the people')
 
