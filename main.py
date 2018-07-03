@@ -1,6 +1,18 @@
 import os
 import discord
+import logging
+import sys
+
 from discord.ext import commands
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 TOKEN = os.environ.get('TOKEN')
 
@@ -16,8 +28,16 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="World of Warcraft, obviously"))
 
 @bot.command()
+async def hello(ctx):
+    await ctx.send(f'Yo {ctx.message.author.name}, keep it gangsta')
+
+@bot.command()
 async def gravy(ctx):
     await ctx.send('Gravy for President!')
+
+@bot.command()
+async def gravylife(ctx):
+    await ctx.send('My friends call me \'G\' because I was a dark gangster from Kimberly Drive. I had a Raiders trench coat that put Juice\'s trench coat to shame. I was OG, ya know.')
 
 @bot.command()
 async def playgame(ctx):
@@ -45,8 +65,8 @@ async def info(ctx):
     # Shows the number of servers the bot is member of.
     embed.add_field(name="Server count", value=f"{len(bot.guilds)}")
 
-    # give users a link to invite this bot to their server
-    # embed.add_field(name="Invite", value="[Invite link](<insert your OAuth invitation link here>)")
+    # Shows link to GitHub code
+    embed.add_field(name="GitHub", value="https://github.com/fringedevil/gravy-bot")
 
     await ctx.send(embed=embed)
 
@@ -56,7 +76,9 @@ bot.remove_command('help')
 async def help(ctx):
     embed = discord.Embed(title="Gravy Bot", description="MOAR Gravy!! List of commands are:", color=0xeee657)
 
+    embed.add_field(name="!hello", value="Say hi to gravy-bot", inline=False)
     embed.add_field(name="!gravy", value="A vote of confidence for Gravy", inline=False)
+    embed.add_field(name="!gravylife", value="The long and winding road to becoming Gravy", inline=False)
     embed.add_field(name="!playgame", value="Ask Gravy bot to play a game", inline=False)
     embed.add_field(name="!favoritemovie", value="Ask Gravy bot what his favorite movie is", inline=False)
     embed.add_field(name="!trenchaf", value="Gravy at peak performance", inline=False)
