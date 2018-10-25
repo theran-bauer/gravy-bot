@@ -20,9 +20,7 @@ TOKEN = os.environ.get('TOKEN')
 bot = commands.Bot(command_prefix='!', description='A Gravy bot for the people')
 
 def hasAttentionSpan():
-    num = random.random()
-    print(f'random() = {num}')
-    return num > 0.05
+    return random.random() > 0.2
 
 @bot.event
 async def on_ready():
