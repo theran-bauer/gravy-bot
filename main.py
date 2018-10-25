@@ -20,7 +20,9 @@ TOKEN = os.environ.get('TOKEN')
 bot = commands.Bot(command_prefix='!', description='A Gravy bot for the people')
 
 def hasAttentionSpan():
-    return random.random() > 0.05
+    num = random.random()
+    print(f'random() = {num}')
+    return num > 0.05
 
 @bot.event
 async def on_ready():
@@ -36,14 +38,14 @@ async def hello(ctx):
     if hasAttentionSpan():
         await ctx.send(f'Yo {ctx.message.author.name}, keep it gangsta')
     else:
-        await ctx.send('Hel-.....spiders!!')
+        await ctx.send(f'Yo {ctx.message.author.name}, -- spiders!!')
 
 @bot.command()
 async def gravy(ctx):
     if hasAttentionSpan():
         await ctx.send('Gravy for President!')
     else:
-        await ctx.send('Spiders!!')
+        await ctx.send('Spiders for President!')
 
 @bot.command()
 async def gravylife(ctx):
@@ -57,28 +59,28 @@ async def playgame(ctx):
     if hasAttentionSpan():
         await ctx.send('INDIFFERENCE TO GAME!')
     else:
-        await ctx.send('INDIFFERENCE T-....SPIDERS!')
+        await ctx.send('INDIFFERENCE TO....SPIDERS!')
 
 @bot.command()
 async def favoritemovie(ctx):
     if hasAttentionSpan():
         await ctx.send('Rush (with totally naked butts)')
     else:
-        await ctx.send('Rush, with totally...hey, spiders!')
+        await ctx.send('Rush, with totally naked...hey, spiders!')
 
 @bot.command()
 async def trenchaf(ctx):
     if hasAttentionSpan():
         await ctx.send('https://media.giphy.com/media/cA7kvk12D4rvBeb4rR/giphy.gif')
     else:
-        await ctx.send('Hel-.....spiders!!')
+        await ctx.send('https://media.giphy.com/media/26gsr8eaTjRiIxKgM/giphy.gif')
 
 @bot.command()
 async def gravybeerface(ctx):
     if hasAttentionSpan():
         await ctx.send('https://media.giphy.com/media/PNwk9K1FVvWyw1QDcz/giphy.gif')
     else:
-        await ctx.send('https://media.giphy.com/media/26gsr8eaTjRiIxKgM/giphy.gif')
+        await ctx.send('https://media.giphy.com/media/QO9rT8VIOD9xS/giphy.gif')
 
 @bot.command()
 async def info(ctx):
@@ -96,7 +98,7 @@ async def info(ctx):
 
         await ctx.send(embed=embed)
     else:
-        embed = discord.Embed(title="Gravy Spider", description="To get your daily spider fix", color=0xeee657)
+        embed = discord.Embed(title="Spider Bot", description="To get your daily spider fix", color=0xeee657)
         embed.add_field(name="Author", value="fingespider")
         embed.add_field(name="Spider count", value=f"{len(bot.guilds)}")
         embed.add_field(name="SpideyHub", value="https://github.com/fringedevil/gravy-bot")
@@ -120,7 +122,7 @@ async def help(ctx):
 
         await ctx.send(embed=embed)
     else:
-        embed = discord.Embed(title="Spider Bot", description="MOAR Spiders!! List of spiders are:", color=0xeee657)
+        embed = discord.Embed(title="Spidey Bot", description="MOAR Spiders!! List of spiders are:", color=0xeee657)
 
         embed.add_field(name="!hello", value="Say hi to spidey-bot", inline=False)
         embed.add_field(name="!gravy", value="A vote of spiders for Gravy", inline=False)
