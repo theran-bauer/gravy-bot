@@ -1,11 +1,15 @@
 import os
 import discord
+import asyncio
 import logging
 import random
 import sys
+import time
 
 from constants import DIVINITY_SKILLS, DIVINITY_WIKI_URL
+from datetime import date, datetime, timedelta
 from discord.ext import commands
+from threading import Thread
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -141,5 +145,53 @@ async def help(ctx):
 
         await ctx.send(embed=embed)
 
+async def idle_task():
+    await bot.wait_until_ready()
+
+    channel = discord.utils.get(bot.get_all_channels(), name='gravy')
+
+    last_battle_dt = datetime.now()
+    last_uplaying_dt = datetime.now()
+    last_whereru_dt = datetime.now()
+
+    while not bot.is_closed:
+        now = datetime.now()
+        # do not spam at sleeping hours
+        if now.hour < 8:
+            continue
+
+        # Gravy craves battle
+        delta = now - last_battle_dt
+        if delta.seconds > 211977: #easter egg!
+            last_battle_dt = datetime.now()
+            if random.randint(0,101) < 50:
+                await channel.send('I CRAVE BATTLE!')
+            else:
+                await channel.send('GRAVY NEED BATTLE!')
+
+        # where are you?
+        delta = now - last_whereru_dt
+        if delta.seconds > 20177: #another egg!
+            last_whereru_dt = datetime.now()
+            members = bot.get_all_members()
+            for member in members:
+                if 'divinity' in (r.name for r in member.roles) and member.status == discord.Status.idle:
+                    await channel.send(f'Where are you? @{member.name}')
+                    break
+        
+        # you playing tonight?
+        delta = now - last_uplaying_dt
+        if delta.days > 0 and now.hour > 17:
+            last_uplaying_dt = datetime.now()
+            members = bot.get_all_members()
+            for member in members:
+                if 'divinity' in (r.name for r in member.roles) and member.status == discord.Status.idle:
+                    await channel.send(f'u playing tonite @{member.name}')
+                    break
+        
+        await asyncio.sleep(60) # task runs every 60 seconds
+
+# Run watcher
+bot.loop.create_task(idle_task)
 # Run bot
 bot.run(TOKEN)
