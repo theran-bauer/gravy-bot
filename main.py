@@ -4,6 +4,7 @@ import logging
 import random
 import sys
 
+from constants import DIVINITY_SKILLS, DIVINITY_WIKI_URL
 from discord.ext import commands
 
 logger = logging.getLogger()
@@ -20,9 +21,7 @@ TOKEN = os.environ.get('TOKEN')
 bot = commands.Bot(command_prefix='!', description='A Gravy bot for the people')
 
 def hasAttentionSpan():
-    num = random.random()
-    print(f'random() = {num}')
-    return num > 0.05
+    return random.random() > 0.2
 
 @bot.event
 async def on_ready():
@@ -83,6 +82,11 @@ async def gravybeerface(ctx):
         await ctx.send('https://media.giphy.com/media/QO9rT8VIOD9xS/giphy.gif')
 
 @bot.command()
+async def divinity(ctx):
+    skill = DIVINITY_SKILLS[random.randint(0,DIVINITY_SKILLS.__len__())]
+    await ctx.send(f'Hey, do you think I should get {skill}? {DIVINITY_WIKI_URL}{skill.replace(" ","+")}')
+
+@bot.command()
 async def info(ctx):
     if hasAttentionSpan():
         embed = discord.Embed(title="Gravy Bot", description="To get your daily gravy fix", color=0xeee657)
@@ -118,6 +122,7 @@ async def help(ctx):
         embed.add_field(name="!favoritemovie", value="Ask Gravy bot what his favorite movie is", inline=False)
         embed.add_field(name="!trenchaf", value="Gravy at peak performance", inline=False)
         embed.add_field(name="!gravybeerface", value="Vintage Gravy", inline=False)
+        embed.add_field(name="!divinity", value="Gravy asks you about Divinity: Original Sin 2", inline=False)
         embed.add_field(name="!info", value="Details on the bot that is Gravy", inline=False)
 
         await ctx.send(embed=embed)
@@ -131,6 +136,7 @@ async def help(ctx):
         embed.add_field(name="!favoritemovie", value="Ask Gravy bot what his favorite spider is", inline=False)
         embed.add_field(name="!trenchaf", value="Gravy at spiderman performance", inline=False)
         embed.add_field(name="!gravybeerface", value="Spider Gravy", inline=False)
+        embed.add_field(name="!divinity", value="Gravy asks you about Divinity: Original Spider 2", inline=False)
         embed.add_field(name="!info", value="Details on the spider that is Gravy", inline=False)
 
         await ctx.send(embed=embed)
