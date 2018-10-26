@@ -154,11 +154,8 @@ async def idle_task():
     last_uplaying_dt = datetime.now()
     last_whereru_dt = datetime.now()
 
-    while not bot.is_closed:
+    while not bot.is_closed():
         now = datetime.now()
-        # do not spam at sleeping hours
-        if now.hour < 8:
-            continue
 
         # Gravy craves battle
         delta = now - last_battle_dt
@@ -176,8 +173,7 @@ async def idle_task():
             members = bot.get_all_members()
             for member in members:
                 if 'divinity' in (r.name for r in member.roles) and member.status == discord.Status.idle:
-                    await channel.send(f'Where are you? @{member.name}')
-                    break
+                    await channel.send(f'Where are you? {member.mention}')
         
         # you playing tonight?
         delta = now - last_uplaying_dt
@@ -185,13 +181,13 @@ async def idle_task():
             last_uplaying_dt = datetime.now()
             members = bot.get_all_members()
             for member in members:
-                if 'divinity' in (r.name for r in member.roles) and member.status == discord.Status.idle:
-                    await channel.send(f'u playing tonite @{member.name}')
-                    break
+                if 'divinity' in (r.name for r in member.roles):
+                    await channel.send(f'u playing tonite {member.mention}')
         
         await asyncio.sleep(60) # task runs every 60 seconds
+    print('idle_task() exit')
 
 # Run watcher
-bot.loop.create_task(idle_task)
+bot.loop.create_task(idle_task())
 # Run bot
 bot.run(TOKEN)
