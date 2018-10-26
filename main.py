@@ -6,7 +6,7 @@ import random
 import sys
 import time
 
-from constants import DIVINITY_SKILLS, DIVINITY_WIKI_URL
+from constants import *
 from datetime import date, datetime, timedelta
 from discord.ext import commands
 from threading import Thread
@@ -21,6 +21,9 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 TOKEN = os.environ.get('TOKEN')
+enable_task = True
+battle_seconds = 211977
+whereru_seconds = 20177
 
 bot = commands.Bot(command_prefix='!', description='A Gravy bot for the people')
 
@@ -99,6 +102,38 @@ async def divinity(ctx):
     await ctx.send(f'Hey, do you think I should get {skill}? {DIVINITY_WIKI_URL}{skill.replace(" ","+")}')
 
 @bot.command()
+async def config(ctx):
+    global enable_task, battle_seconds, whereru_seconds
+
+    parts = ctx.message.split(' ')
+    if len(parts) < 3:
+        embed = discord.Embed(title="Gravy Bot Config", description="List of configurations are:", color=0xeee657)
+
+        embed.add_field(name="!config tasks on|off", value="Enable or disable background tasks", inline=False)
+        embed.add_field(name="!config battle <seconds>", value="Set the number of seconds before Gravy craves battle", inline=False)
+        embed.add_field(name="!config where <seconds>", value="Set the number of seconds before Gravy loses track of you", inline=False)
+
+        await ctx.send(embed=embed)
+    else:
+        setting = parts[1].lower()
+        value = parts[2]
+
+        if setting != "tasks":
+            try:
+                value = int(parts[2])
+            except ValueError:
+                await ctx.send(f'!config {parts[1]} <value> must be an number')
+                return
+        
+        if setting == 'tasks':
+            enable_task = value == 'enable' or value == 'on' or value == 'true'
+        if setting == 'battle':
+            battle_seconds = value
+        if setting == 'where':
+            whereru_seconds = value
+        await ctx.send(f'{parts[1]} set to {parts[2]}')
+    
+@bot.command()
 async def info(ctx):
     if hasAttentionSpan():
         embed = discord.Embed(title="Gravy Bot", description="To get your daily gravy fix", color=0xeee657)
@@ -136,6 +171,7 @@ async def help(ctx):
         embed.add_field(name="!gravybeerface", value="Vintage Gravy", inline=False)
         embed.add_field(name="!divinity", value="Gravy asks you about Divinity: Original Sin 2", inline=False)
         embed.add_field(name="!info", value="Details on the bot that is Gravy", inline=False)
+        embed.add_field(name="!config", value="See instructions on configurating settings", inline=False)
 
         await ctx.send(embed=embed)
     else:
@@ -150,6 +186,7 @@ async def help(ctx):
         embed.add_field(name="!gravybeerface", value="Spider Gravy", inline=False)
         embed.add_field(name="!divinity", value="Gravy asks you about Divinity: Original Spider 2", inline=False)
         embed.add_field(name="!info", value="Details on the spider that is Gravy", inline=False)
+        embed.add_field(name="!config", value="See instructions on configurating spiders", inline=False)
 
         await ctx.send(embed=embed)
 
@@ -165,31 +202,44 @@ async def idle_task():
     while not bot.is_closed():
         now = datetime.now()
 
+        # if config enabled and not while we're sleeping
+        if not enable_task or now.hour < 8:
+            continue
+
         # Gravy craves battle
         delta = now - last_battle_dt
-        if delta.seconds > 211977: #easter egg!
+        if delta.seconds > battle_seconds:
             last_battle_dt = datetime.now()
-            if random.randint(0,101) < 50:
-                await channel.send('I CRAVE BATTLE!')
-            else:
-                await channel.send('GRAVY NEED BATTLE!')
+            msg = ''
+            if random.random() < 0.5: # tag someone half the time
+                members = getGroupMembers('divinity')
+                target = members[random.randint(0,len(members))]
+                msg = target.mention + ' '
+            msg += GRAVY_BATTLE_QUOTES[random.randint(0,len(GRAVY_BATTLE_QUOTES))]
+            await channel.send(msg)
 
         # where are you?
         delta = now - last_whereru_dt
-        if delta.seconds > 20177: #another egg!
+        if delta.seconds > whereru_seconds:
             last_whereru_dt = datetime.now()
             members = getGroupMembers('divinity')
             members = [m for m in members if m.status == discord.Status.idle]
             target = members[random.randint(0,len(members))]
             await channel.send(f'Where are you? {target.mention}')
         
-        # you playing tonight?
+        # you playing tonight
         delta = now - last_uplaying_dt
         if delta.days > 0 and now.hour > 17:
             last_uplaying_dt = datetime.now()
-            members = getGroupMembers('divinity')
-            target = members[random.randint(0,len(members))]
-            await channel.send(f'u playing tonite {target.mention}')
+            # tag a person, or use character name.
+            # gravy does not use question marks
+            if random.random() < 0.5:
+                members = getGroupMembers('divinity')
+                target = members[random.randint(0,len(members))]
+                await channel.send(f'u playing tonite {target.mention}')
+            else:
+                target = DIVINITY_CHARS[random.randint(0,len(DIVINITY_CHARS))]
+                await channel.send(f'u playing tonite {target.mention}')
         
         await asyncio.sleep(60) # task runs every 60 seconds
     print('idle_task() exit')
