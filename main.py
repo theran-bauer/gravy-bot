@@ -27,6 +27,14 @@ bot = commands.Bot(command_prefix='!', description='A Gravy bot for the people')
 def hasAttentionSpan():
     return random.random() > 0.2
 
+def getGroupMembers(group):
+    list = []
+    members = bot.get_all_members()
+    for member in members:
+        if group in (r.name for r in member.roles):
+            list.append(member)
+    return list
+
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -170,19 +178,18 @@ async def idle_task():
         delta = now - last_whereru_dt
         if delta.seconds > 20177: #another egg!
             last_whereru_dt = datetime.now()
-            members = bot.get_all_members()
-            for member in members:
-                if 'divinity' in (r.name for r in member.roles) and member.status == discord.Status.idle:
-                    await channel.send(f'Where are you? {member.mention}')
+            members = getGroupMembers('divinity')
+            members = [m for m in members if m.status == discord.Status.idle]
+            target = members[random.randint(0,len(members))]
+            await channel.send(f'Where are you? {target.mention}')
         
         # you playing tonight?
         delta = now - last_uplaying_dt
         if delta.days > 0 and now.hour > 17:
             last_uplaying_dt = datetime.now()
-            members = bot.get_all_members()
-            for member in members:
-                if 'divinity' in (r.name for r in member.roles):
-                    await channel.send(f'u playing tonite {member.mention}')
+            members = getGroupMembers('divinity')
+            target = members[random.randint(0,len(members))]
+            await channel.send(f'u playing tonite {target.mention}')
         
         await asyncio.sleep(60) # task runs every 60 seconds
     print('idle_task() exit')
