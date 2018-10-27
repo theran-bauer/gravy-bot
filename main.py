@@ -98,14 +98,14 @@ async def gravybeerface(ctx):
 
 @bot.command()
 async def divinity(ctx):
-    skill = DIVINITY_SKILLS[random.randint(0,DIVINITY_SKILLS.__len__())]
+    skill = DIVINITY_SKILLS[random.randint(0,len(DIVINITY_SKILLS)-1)]
     await ctx.send(f'Hey, do you think I should get {skill}? {DIVINITY_WIKI_URL}{skill.replace(" ","+")}')
 
 @bot.command()
 async def config(ctx):
     global enable_task, battle_seconds, whereru_seconds
 
-    parts = ctx.message.split(' ')
+    parts = ctx.message.content.split(' ')
     if len(parts) < 3:
         embed = discord.Embed(title="Gravy Bot Config", description="List of configurations are:", color=0xeee657)
 
@@ -131,7 +131,7 @@ async def config(ctx):
             battle_seconds = value
         if setting == 'where':
             whereru_seconds = value
-        await ctx.send(f'{parts[1]} set to {parts[2]}')
+        await ctx.send(f'**config.{parts[1]}** set to {parts[2]}')
     
 @bot.command()
 async def info(ctx):
@@ -213,9 +213,10 @@ async def idle_task():
             msg = ''
             if random.random() < 0.5: # tag someone half the time
                 members = getGroupMembers('divinity')
-                target = members[random.randint(0,len(members))]
-                msg = target.mention + ' '
-            msg += GRAVY_BATTLE_QUOTES[random.randint(0,len(GRAVY_BATTLE_QUOTES))]
+                if len(members) > 0:
+                    target = members[random.randint(0,len(members)-1)]
+                    msg = target.mention + ' '
+            msg += GRAVY_BATTLE_QUOTES[random.randint(0,len(GRAVY_BATTLE_QUOTES)-1)]
             await channel.send(msg)
 
         # where are you?
@@ -224,8 +225,9 @@ async def idle_task():
             last_whereru_dt = datetime.now()
             members = getGroupMembers('divinity')
             members = [m for m in members if m.status == discord.Status.idle]
-            target = members[random.randint(0,len(members))]
-            await channel.send(f'Where are you? {target.mention}')
+            if len(members) > 0:
+                target = members[random.randint(0,len(members)-1)]
+                await channel.send(f'Where are you? {target.mention}')
         
         # you playing tonight
         delta = now - last_uplaying_dt
@@ -235,10 +237,11 @@ async def idle_task():
             # gravy does not use question marks
             if random.random() < 0.5:
                 members = getGroupMembers('divinity')
-                target = members[random.randint(0,len(members))]
-                await channel.send(f'u playing tonite {target.mention}')
+                if len(members) > 0:
+                    target = members[random.randint(0,len(members)-1)]
+                    await channel.send(f'u playing tonite {target.mention}')
             else:
-                target = DIVINITY_CHARS[random.randint(0,len(DIVINITY_CHARS))]
+                target = DIVINITY_CHARS[random.randint(0,len(DIVINITY_CHARS)-1)]
                 await channel.send(f'u playing tonite {target.mention}')
         
         await asyncio.sleep(60) # task runs every 60 seconds
