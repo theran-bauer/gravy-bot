@@ -244,7 +244,7 @@ async def idle_task():
                 target = DIVINITY_CHARS[random.randint(0,len(DIVINITY_CHARS)-1)]
                 await channel.send(f'u playing tonite {target.mention}')
         
-        await asyncio.sleep(60) # task runs every 60 seconds
+        await asyncio.sleep(15) # task runs every 15 seconds
     print('idle_task() exit')
 
 # Run watcher
