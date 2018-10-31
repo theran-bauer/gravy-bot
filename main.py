@@ -31,12 +31,12 @@ def hasAttentionSpan():
     return random.random() > 0.2
 
 def getGroupMembers(group):
-    list = []
+    memberList = []
     members = bot.get_all_members()
     for member in members:
         if group in (r.name for r in member.roles):
-            list.append(member)
-    return list
+            memberList.append(member)
+    return memberList
 
 @bot.event
 async def on_ready():
@@ -98,7 +98,7 @@ async def gravybeerface(ctx):
 
 @bot.command()
 async def divinity(ctx):
-    skill = DIVINITY_SKILLS[random.randint(0,len(DIVINITY_SKILLS)-1)]
+    skill = random.choice(DIVINITY_SKILLS)
     await ctx.send(f'Hey, do you think I should get {skill}? {DIVINITY_WIKI_URL}{skill.replace(" ","+")}')
 
 @bot.command()
@@ -124,7 +124,7 @@ async def config(ctx):
             except ValueError:
                 await ctx.send(f'!config {parts[1]} <value> must be an number')
                 return
-        
+
         if setting == 'tasks':
             enable_task = value == 'enable' or value == 'on' or value == 'true'
         if setting == 'battle':
@@ -198,6 +198,7 @@ async def idle_task():
     last_battle_dt = datetime.now()
     last_uplaying_dt = datetime.now()
     last_whereru_dt = datetime.now()
+    last_bodily_dt = datetime.now()
 
     while not bot.is_closed():
         now = datetime.now()
@@ -214,9 +215,9 @@ async def idle_task():
             if random.random() < 0.5: # tag someone half the time
                 members = getGroupMembers('divinity')
                 if len(members) > 0:
-                    target = members[random.randint(0,len(members)-1)]
+                    target = random.choice(members)
                     msg = target.mention + ' '
-            msg += GRAVY_BATTLE_QUOTES[random.randint(0,len(GRAVY_BATTLE_QUOTES)-1)]
+            msg += random.choice(GRAVY_BATTLE_QUOTES)
             await channel.send(msg)
 
         # where are you?
@@ -226,24 +227,30 @@ async def idle_task():
             members = getGroupMembers('divinity')
             members = [m for m in members if m.status == discord.Status.idle]
             if len(members) > 0:
-                target = members[random.randint(0,len(members)-1)]
+                target = random.choice(members)
                 await channel.send(f'Where are you? {target.mention}')
-        
+
         # you playing tonight
         delta = now - last_uplaying_dt
-        if delta.days > 0 and now.hour > 17:
+        if delta.seconds > 28800 and now.hour > 17:
             last_uplaying_dt = datetime.now()
             # tag a person, or use character name.
             # gravy does not use question marks
             if random.random() < 0.5:
                 members = getGroupMembers('divinity')
                 if len(members) > 0:
-                    target = members[random.randint(0,len(members)-1)]
+                    target = random.choice(members)
                     await channel.send(f'u playing tonite {target.mention}')
             else:
-                target = DIVINITY_CHARS[random.randint(0,len(DIVINITY_CHARS)-1)]
+                target = random.choice(DIVINITY_CHARS)
                 await channel.send(f'u playing tonite {target.mention}')
-        
+
+        # bodily functions
+        delta = now - last_bodily_dt
+        if delta.seconds > 14400:
+            last_bodily_dt = datetime.now()
+            await channel.send(random.choice(GRAVY_BODILY_FUNCTIONS))
+
         await asyncio.sleep(15) # task runs every 15 seconds
     print('idle_task() exit')
 
