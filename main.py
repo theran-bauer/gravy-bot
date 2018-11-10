@@ -22,8 +22,7 @@ logger.addHandler(ch)
 
 TOKEN = os.environ.get('TOKEN')
 enable_task = True
-battle_seconds = 211977
-whereru_seconds = 20177
+bodily_seconds = 10800
 
 bot = commands.Bot(command_prefix='!', description='A Gravy bot for the people')
 
@@ -103,15 +102,14 @@ async def divinity(ctx):
 
 @bot.command()
 async def config(ctx):
-    global enable_task, battle_seconds, whereru_seconds
+    global enable_task, bodily_seconds
 
     parts = ctx.message.content.split(' ')
     if len(parts) < 3:
         embed = discord.Embed(title="Gravy Bot Config", description="List of configurations are:", color=0xeee657)
 
         embed.add_field(name="!config tasks on|off", value="Enable or disable background tasks", inline=False)
-        embed.add_field(name="!config battle <seconds>", value="Set the number of seconds before Gravy craves battle", inline=False)
-        embed.add_field(name="!config where <seconds>", value="Set the number of seconds before Gravy loses track of you", inline=False)
+        embed.add_field(name="!config bodily <seconds>", value="Set the max num of seconds before Gravy must belch, etc.", inline=False)
 
         await ctx.send(embed=embed)
     else:
@@ -127,10 +125,8 @@ async def config(ctx):
 
         if setting == 'tasks':
             enable_task = value == 'enable' or value == 'on' or value == 'true'
-        if setting == 'battle':
-            battle_seconds = value
-        if setting == 'where':
-            whereru_seconds = value
+        if setting == 'bodily':
+            bodily_seconds = value
         await ctx.send(f'**config.{parts[1]}** set to {parts[2]}')
     
 @bot.command()
@@ -195,22 +191,22 @@ async def idle_task():
 
     channel = discord.utils.get(bot.get_all_channels(), name='gravy')
 
-    last_battle_dt = datetime.now()
-    last_uplaying_dt = datetime.now()
-    last_whereru_dt = datetime.now()
-    last_bodily_dt = datetime.now()
+    hour = 17 - datetime.now().hour
+    last_battle_dt = datetime.now() + timedelta(hours=hour, seconds=random.randint(2177,18000))
+    last_uplaying_dt = datetime.now() + timedelta(hours=hour, seconds=random.randint(2177,14400))
+    last_whereru_dt = datetime.now() + timedelta(hours=hour, seconds=random.randint(2177,18000))
+    last_bodily_dt = datetime.now() + timedelta(hours=hour, seconds=random.randint(0,20177))
 
     while not bot.is_closed():
         now = datetime.now()
 
-        # if config enabled and not while we're sleeping
-        if not enable_task or now.hour < 8:
+        # if config enabled and after 5pm
+        if not enable_task or now.hour < 17:
             continue
 
         # Gravy craves battle
-        delta = now - last_battle_dt
-        if delta.seconds > battle_seconds:
-            last_battle_dt = datetime.now()
+        if now > last_battle_dt:
+            last_battle_dt += timedelta(days=1, seconds=random.randint(2177,14400))
             msg = ''
             if random.random() < 0.5: # tag someone half the time
                 members = getGroupMembers('divinity')
@@ -221,9 +217,8 @@ async def idle_task():
             await channel.send(msg)
 
         # where are you?
-        delta = now - last_whereru_dt
-        if delta.seconds > whereru_seconds:
-            last_whereru_dt = datetime.now()
+        if now > last_whereru_dt:
+            last_whereru_dt += timedelta(days=1, seconds=random.randint(2177,18000))
             members = getGroupMembers('divinity')
             members = [m for m in members if m.status == discord.Status.idle]
             if len(members) > 0:
@@ -231,9 +226,8 @@ async def idle_task():
                 await channel.send(f'Where are you? {target.mention}')
 
         # you playing tonight
-        delta = now - last_uplaying_dt
-        if delta.seconds > 28800 and now.hour > 17:
-            last_uplaying_dt = datetime.now()
+        if now > last_uplaying_dt:
+            last_uplaying_dt += timedelta(days=1, seconds=random.randint(2177,14400))
             # tag a person, or use character name.
             # gravy does not use question marks
             if random.random() < 0.5:
@@ -246,9 +240,8 @@ async def idle_task():
                 await channel.send(f'u playing tonite {target.mention}')
 
         # bodily functions
-        delta = now - last_bodily_dt
-        if delta.seconds > 14400:
-            last_bodily_dt = datetime.now()
+        if now > last_bodily_dt:
+            last_bodily_dt += timedelta(seconds=random.randint(0,bodily_seconds))
             await channel.send(random.choice(GRAVY_BODILY_FUNCTIONS))
 
         await asyncio.sleep(15) # task runs every 15 seconds
