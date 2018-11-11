@@ -206,7 +206,7 @@ async def idle_task():
 
         # Gravy craves battle
         if now > last_battle_dt:
-            last_battle_dt += timedelta(days=1, seconds=random.randint(2177,14400))
+            last_battle_dt = now + timedelta(days=1, seconds=random.randint(2177,14400))
             msg = ''
             if random.random() < 0.5: # tag someone half the time
                 members = getGroupMembers('divinity')
@@ -218,7 +218,7 @@ async def idle_task():
 
         # where are you?
         if now > last_whereru_dt:
-            last_whereru_dt += timedelta(days=1, seconds=random.randint(2177,18000))
+            last_whereru_dt = now + timedelta(days=1, seconds=random.randint(2177,18000))
             members = getGroupMembers('divinity')
             members = [m for m in members if m.status == discord.Status.idle]
             if len(members) > 0:
@@ -227,7 +227,7 @@ async def idle_task():
 
         # you playing tonight
         if now > last_uplaying_dt:
-            last_uplaying_dt += timedelta(days=1, seconds=random.randint(2177,14400))
+            last_uplaying_dt = now + timedelta(days=1, seconds=random.randint(2177,14400))
             # tag a person, or use character name.
             # gravy does not use question marks
             if random.random() < 0.5:
@@ -241,7 +241,7 @@ async def idle_task():
 
         # bodily functions
         if now > last_bodily_dt:
-            last_bodily_dt += timedelta(seconds=random.randint(0,bodily_seconds))
+            last_bodily_dt = now + timedelta(seconds=random.randint(0,bodily_seconds))
             await channel.send(random.choice(GRAVY_BODILY_FUNCTIONS))
 
         await asyncio.sleep(15) # task runs every 15 seconds
